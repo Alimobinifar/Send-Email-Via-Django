@@ -1,8 +1,9 @@
 from django.shortcuts import render, HttpResponse
 from django.views import View
+from django.core.mail import send_mail, EmailMessage
 from .forms import EmailForm
-from django.core.mail import send_mail
 from django.conf import settings
+
 
 
 class SendMailView(View):
@@ -19,11 +20,12 @@ class SendMailView(View):
             from_email = settings.EMAIL_HOST_USER
             recipient_list=[]
             recipient_list.append(form_data.cleaned_data['email'])
-            res = send_mail(subject, message, from_email, recipient_list)
-            if res is 1:
+            email = send_mail(subject, message, from_email, recipient_list)
+            if email is 1:
                 return HttpResponse("Email has been send successfully")
             else:
-                return HttpResponse(res)
+                return HttpResponse(form_data.errors)
+
         else:
-            return HttpResponse("Please send validated data ... ")
+            return HttpResponse(form_data.errors)
 
